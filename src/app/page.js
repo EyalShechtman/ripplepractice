@@ -1,103 +1,111 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
+
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+  const [board, setBoard] = useState(Array(9).fill(""));
+  const [turn, setTurn] = useState('X');
+  const [winner, setWinner] = useState(null); 
+  const [isDraw, setIsDraw] = useState(false);
+
+
+
+  const onClickHandler = (index) => {
+    if (board[index] !== "" || checkWinner() ) return;
+    console.log(index);
+    const newBoard = [...board];
+    newBoard[index] = turn;
+    setBoard(newBoard);
+
+    const winner = checkWinner();
+    if(winner){
+      alert(winner + 'wins');
+      return;
+    }
+
+    setTurn(turn === 'X' ? 'O' : 'X');
+  }
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(""));
+    setTurn('X');
+    setWinner(null);
+  }
+
+  const checkWinner = () => {
+    const winningConditions = [
+      [1,2,3],
+      [4,5,6],
+      [7,8,9],
+      [1,4,7],
+      [2,5,8],
+      [3,6,9],
+      [1,5,9],
+      [3,5,7]
+    ]
+    for (let i = 0; i< winningConditions.length; i++) {
+      const [a,b,c] = winningConditions[i].map(x => x -1);
+      console.log(board[a], board[b], board[c]);
+
+      if (board[a] === board[b] && board[a] === board[c] && board[a] !== "") {
+        setWinner(board[a]);
+        return board[a];
+      }
+    }
+    return null;
+  };
+
+
+  return (
+    <div>
+      <h1 style={{justifyContent: 'center', display: 'flex', fontSize: '48px'}}><strong>TicTacToe</strong></h1>
+
+      <div style={{justifyContent: 'center', display: 'flex', fontSize: '24px', margin: 'auto'}}>
+        its {turn} turn
+      </div>
+
+      <div style={{ justifyContent: "center", display: "flex", fontSize: "24px", margin: "auto" }}>
+        {winner ?`🎉 ${winner} wins!` : isDraw ? "It's a draw!" : ""}
+      </div>
+
+
+      <div 
+      className="board"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '1px',
+        width: '300px',
+        margin: 'auto'
+      }}>
+        {board.map((cell, index) => (
+          <div
+          key={index}
+          onClick={() => {onClickHandler(index)}}
+
+          style={{
+            backgroundColor: 'white',
+            height: '100px',
+            width: '100px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '2rem',
+            cursor: 'pointer',
+            border: '2px solid black'
+          }}>
+            {cell}
+          </div>
+        ))}
+
+
+      </div>
+      <div>
+        <button onClick={resetGame} style={{backgroundColor: 'white', margin: 'auto', width: '100%'}}>Reset Game</button>
+      </div>
+
+    </div>);
 }
